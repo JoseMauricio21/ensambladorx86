@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Glosario interactivo de instrucciones de lenguaje ensamblador x86, organizado por categorías con ejemplos y referencias.">
+    <meta name="keywords" content="ensamblador, assembly, x86, Intel, programación, bajo nivel, MOV, ADD, JMP">
+    <meta name="author" content="Jose Mauricio Manja">
+    <meta name="theme-color" content="#2d3748">
+    <title>Glosario Interactivo - Lenguaje Ensamblador</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Variables CSS - Modo Claro */
+        :root {
+            --primary-color: #2d3748;
+            --primary-color-rgb: 45, 55, 72;
+            --secondary-color: #3182ce;
+            --accent-color: #e53e3e;
+            --background-color: #f8fafc;
+            --background-color-rgb: 248, 250, 252;
+            --background-color-dark-rgb: 16, 20, 32;
+            --card-background: #ffffff;
+            --text-color: #1a202c;
+            --text-secondary: #4a5568;
+            --border-color: #edf2f7;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 3px 6px rgba(0, 0, 0, 0.06);
+            
+            /* Colores por categoría - Paleta moderna y suave */
+            --data-color: #4fd1c5;
+            --arithmetic-color: #f6ad55;
+            --flow-color: #9f7aea;
+            --stack-color: #f6e05e;
+            --logical-color: #68d391;
+            --shift-color: #ed64a6;
+            --flags-color: #63b3ed;
+            --misc-color: #a0aec0;
+            
+            /* Animation durations */
+            --transition-speed: 0.2s;
+            --expand-speed: 0.25s;
+            --hover-speed: 0.15s;
+            --focus-speed: 0.2s;
+            
+            /* Dimensiones */
+            --header-height: 60px;
+            --nav-height: 60px;
+            --border-radius: 8px;
+            --content-padding: 16px;
+            --card-header-padding: 12px 16px;
+            
+            /* Tipografía */
+            --font-primary: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-mono: 'Fira Code', Consolas, Monaco, 'Courier New', monospace;
+        }
+
+        /* Modo Oscuro */
+        [data-theme="dark"] {
+            --primary-color: #171923;
+            --secondary-color: #4299e1;
+            --accent-color: #fc8181;
+            --background-color: #101420;
+            --card-background: #1a202c;
+            --text-color: #f7fafc;
+            --text-secondary: #e2e8f0;
+            --border-color: #2d3748;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 3px 8px rgba(0, 0, 0, 0.4);
+            
+            /* Oscuro: Colores por categoría más vibrantes para mejor contraste */
+            --data-color: #4fd1c5;
+            --arithmetic-color: #fbd38d;
+            --flow-color: #b794f4;
+            --stack-color: #faf089;
+            --logical-color: #9ae6b4;
+            --shift-color: #f687b3;
+            --flags-color: #90cdf4;
+            --misc-color: #cbd5e0;
+        }
+
+        /* Importar fuentes */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease-in-out;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Clase para transición suave al cambiar tema */
+        .theme-transition {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease !important;
+        }
+        
+        .theme-transition * {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease !important;
+        }
+
+        /* Focus styles for accessibility */
+        :focus {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: 2px;
+        }
+
+        :focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--secondary-color);
+            outline-offset: 2px;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: transparent;
+            color: white;
+            line-height: 1.6;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            letter-spacing: 0.01em;
+            padding-top: var(--header-height);
+        }
+
+        /* Cabecera */
+        header {
+            background-color: rgba(var(--primary-color-rgb), 0.2);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="dark"] header {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 1400px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background-color: transparent;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 24px;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+        button {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+            min-width: 40px;
+            height: 36px;
+        }
+
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+        }
+
+        /* Hero Section */
+        .hero {
+            color: white;
+            padding: 180px 20px 100px;
+            text-align: center;
+            position: relative;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -var(--header-height);
+            z-index: 1;
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .video-background video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            opacity: 1;
+        }
+
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+            z-index: -1;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+            animation: fadeInUp 1s ease 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            animation: fadeInUp 1s ease 0.4s;
+            animation-fill-mode: both;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 40px 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 20px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] .container {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Secciones */
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 2rem;
+            color: white;
+            display: inline-block;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background-color: var(--secondary-color);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Grid de categorías */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: all var(--transition-speed) ease;
+            border-top: 4px solid;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transform: translateY(0);
+            text-decoration: none;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top-width: 4px;
+        }
+        
+        [data-theme="dark"] .category-card {
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top-width: 4px;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .category-card[data-category="data"] { border-color: var(--data-color); }
+        .category-card[data-category="arithmetic"] { border-color: var(--arithmetic-color); }
+        .category-card[data-category="flow"] { border-color: var(--flow-color); }
+        .category-card[data-category="stack"] { border-color: var(--stack-color); }
+        .category-card[data-category="logical"] { border-color: var(--logical-color); }
+        .category-card[data-category="shift"] { border-color: var(--shift-color); }
+        .category-card[data-category="flags"] { border-color: var(--flags-color); }
+        .category-card[data-category="misc"] { border-color: var(--misc-color); }
+
+        .category-card-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-icon {
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="dark"] .category-icon {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .category-card[data-category="data"] .category-icon { color: var(--data-color); }
+        .category-card[data-category="arithmetic"] .category-icon { color: var(--arithmetic-color); }
+        .category-card[data-category="flow"] .category-icon { color: var(--flow-color); }
+        .category-card[data-category="stack"] .category-icon { color: var(--stack-color); }
+        .category-card[data-category="logical"] .category-icon { color: var(--logical-color); }
+        .category-card[data-category="shift"] .category-icon { color: var(--shift-color); }
+        .category-card[data-category="flags"] .category-icon { color: var(--flags-color); }
+        .category-card[data-category="misc"] .category-icon { color: var(--misc-color); }
+
+        .category-title {
+            flex-grow: 1;
+        }
+
+        .category-title h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .category-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .category-description {
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            flex-grow: 1;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-description p {
+            margin-bottom: 10px;
+            color: white;
+        }
+            margin-bottom: 10px;
+        }
+        
+        .category-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .instruction-count {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        [data-theme="dark"] .instruction-count {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-view {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view:hover {
+            transform: translateX(5px);
+        }
+
+        /* Contenedor de imágenes */
+        .category-image {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .category-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .category-card:hover .category-image img {
+            transform: scale(1.05);
+        }
+
+        .category-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.2) 100%);
+            z-index: 1;
+        }
+
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Footer */
+        footer {
+            background-color: rgba(0, 0, 0, 0.3);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 50px;
+            position: relative;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-content h3 {
+            margin-bottom: 20px;
+        }
+
+        .footer-content p {
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .hero {
+                min-height: 400px;
+                padding: 60px 20px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .header-container {
+                flex-direction: column;
+                padding: 10px;
+                gap: 10px;
+            }
+
+            header {
+                height: auto;
+                min-height: var(--header-height);
+            }
+
+            .controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            body {
+                padding-top: 100px;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .category-image {
+                height: 140px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <header>
+        <div class="header-container">
+            <div class="logo-container">
+                <div class="logo"><i class="fas fa-microchip"></i></div>
+                <h1>Glosario Interactivo de Lenguaje Ensamblador</h1>
+            </div>
+            <div class="controls">
+                <button id="toggleTheme"><i class="fas fa-sun"></i> Modo Claro</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="video-background">
+            <video autoplay loop muted playsinline style="opacity: 1;">
+                <source src="https://videos.pexels.com/video-files/4709304/4709304-uhd_2732_1440_25fps.mp4" type="video/mp4">
+                <!-- Fallback if video doesn't load -->
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="video-overlay"></div>
+        <img src="https://static-00.iconduck.com/assets.00/dosbox-alt-icon-456x512-9ks4vrgo.png" alt="DOSBox Icon" style="width: 120px; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); filter: invert(1) drop-shadow(0 4px 8px rgba(0,0,0,0.3)); z-index: 5;">
+        <div class="hero-content">
+            <h2>Aprende Lenguaje Ensamblador x86</h2>
+            <p>Explora nuestro glosario interactivo con más de 50 instrucciones de lenguaje ensamblador, organizadas por categorías, con ejemplos y referencias detalladas para cada una.</p>
+            <div class="hero-buttons">
+                <a href="#categories" class="btn-primary"><i class="fas fa-th"></i> Explorar Categorías</a>
+                <a href="Untitled-2.html" class="btn-secondary"><i class="fas fa-book"></i> Ver Glosario Completo</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="container" id="categories">
+        <div class="section-title">
+            <h2>Categorías de Instrucciones</h2>
+        </div>
+
+        <div class="categories-grid">
+            <!-- Transferencia de Datos -->
+            <a href="Untitled-2.html#data" class="category-card" data-category="data">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="category-title">
+                        <h3>Transferencia de Datos</h3>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" alt="Data Transfer Operations">
+                    </div>
+                    <div class="category-description">
+                        <p>Instrucciones para mover datos entre registros, memoria y otros dispositivos del sistema.</p>
+                        <p>Incluye operaciones como MOV, XCHG, LEA, PUSH, POP, IN, OUT y más.</p>
+                    </div>
+                    <div class="category-footer">
+                        <div class="instruction-count">10 instrucciones</div>
+                        <div class="btn-view">Ver detalles <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Operaciones Aritméticas -->
+            <a href="Untitled-2.html#arithmetic" class="category-card" data-category="arithmetic">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <div class="category-title">
+                        <h3>Operaciones Aritméticas</h3>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1594980596870-8aa52a78d8cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" alt="Arithmetic Operations">
+                    </div>
+                    <div class="category-description">
+                        <p>Instrucciones para realizar operaciones matemáticas como suma, resta, multiplicación y división.</p>
+                        <p>Incluye operaciones como ADD, SUB, MUL, DIV, INC, DEC, NEG y más.</p>
+                    </div>
+                    <div class="category-footer">
+                        <div class="instruction-count">12 instrucciones</div>
+                        <div class="btn-view">Ver detalles <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Control de Flujo -->
+            <a href="Untitled-2.html#flow" class="category-card" data-category="flow">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <i class="fas fa-random"></i>
+                    </div>
+                    <div class="category-title">
+                        <h3>Control de Flujo</h3>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" alt="Flow Control">
+                    </div>
+                    <div class="category-description">
+                        <p>Instrucciones para controlar el flujo de ejecución del programa, como saltos, llamadas a subrutinas y bucles.</p>
+                        <p>Incluye JMP, CALL, RET, LOOP, JE/JNE, JZ/JNZ y más.</p>
+                    </div>
+                    <div class="category-footer">
+                        <div class="instruction-count">14 instrucciones</div>
+                        <div class="btn-view">Ver detalles <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Operaciones de Pila -->
+            <a href="Untitled-2.html#stack" class="category-card" data-category="stack">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="category-title">
+                        <h3>Operaciones de Pila</h3>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1529078155058-5d716f45d604?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" alt="Stack Operations">
+                    </div>
+                    <div class="category-description">
+                        <p>Instrucciones para gestionar la pila, almacenando y recuperando datos.</p>
+                        <p>Incluye PUSH, POP, PUSHF/POPF, PUSHA/POPA, ENTER/LEAVE y BOUND.</p>
+                    </div>
+                    <div class="category-footer">
+                        <div class="instruction-count">5 instrucciones</div>
+                        <div class="btn-view">Ver detalles <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Operaciones Lógicas -->
+            <a href="Untitled-2.html#logical" class="category-card" data-category="logical">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="category-title">
+                        <h3>Operaciones Lógicas</h3>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1496065187959-7f07b8353c55?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" alt="Logical Operations">
+                    </div>
+                    <div class="category-description">
+                        <p>Instrucciones para realizar operaciones lógicas bit a bit entre operandos.</p>
+                        <p>Incluye AND, OR, XOR, NOT, TEST, BT, BTS, BTR, BTC.</p>
+                    </div>
+                    <div class="category-footer">
+                        <div class="instruction-count">9 instrucciones</div>
+                        <div class="btn-view">Ver detalles <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Desplazamientos -->
+            <a href="Untitled-2.html#shift" class="category-card" data-category="shift">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <i class="fas fa-arrows-alt-h"></i>
+                    </div>
+                    <div class="category-title">
+                        <h3>Desplazamientos</h3>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" alt="Shift Operations">
+                    </div>
+                    <div class="category-description">
+                        <p>Instrucciones para desplazar bits a la izquierda o derecha dentro de los operandos.</p>
+                        <p>Incluye SHL/SHR, SAL/SAR, ROL/ROR, RCL/RCR.</p>
+                    </div>
+                    <div class="category-footer">
+                        <div class="instruction-count">8 instrucciones</div>
+                        <div class="btn-view">Ver detalles <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Control de Banderas -->
+            <a href="Untitled-2.html#flags" class="category-card" data-category="flags">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <div class="category-title">
+                        <h3>Control de Banderas</h3>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" alt="Flags">
+                    </div>
+                    <div class="category-description">
+                        <p>Instrucciones para manipular directamente las banderas del procesador.</p>
+                        <p>Incluye CLC, STC, CMC, STI, CLI, STD, CLD.</p>
+                    </div>
+                    <div class="category-footer">
+                        <div class="instruction-count">7 instrucciones</div>
+                        <div class="btn-view">Ver detalles <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Misceláneas -->
+            <a href="Untitled-2.html#misc" class="category-card" data-category="misc">
+                <div class="category-card-header">
+                    <div class="category-icon">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                    <div class="category-title">
+                        <h3>Misceláneas</h3>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <div class="category-image">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2000&q=80" alt="Miscellaneous Operations">
+                    </div>
+                    <div class="category-description">
+                        <p>Otras instrucciones que realizan operaciones especiales o de control del procesador.</p>
+                        <p>Incluye HLT, NOP, WAIT, ESC, LOCK, IRET.</p>
+                    </div>
+                    <div class="category-footer">
+                        <div class="instruction-count">6 instrucciones</div>
+                        <div class="btn-view">Ver detalles <i class="fas fa-arrow-right"></i></div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <h3>Glosario Interactivo de Lenguaje Ensamblador</h3>
+            <p>Esta es una herramienta educativa para el aprendizaje del lenguaje ensamblador x86.</p>
+            
+            <div class="footer-links">
+                <a href="https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html" target="_blank"><i class="fas fa-book"></i> Manual Intel</a>
+                <a href="https://www.amd.com/en/support/tech-docs" target="_blank"><i class="fas fa-book"></i> Manual AMD</a>
+                <a href="https://github.com/" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+            
+            <p>&copy; 2025 Jose Mauricio Manja - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <script>
+        // Modo oscuro/claro con transición suave
+        document.getElementById('toggleTheme').addEventListener('click', function() {
+            // Añadir clase para transición suave antes de cambiar el tema
+            document.body.classList.add('theme-transition');
+            
+            // Cambiar el tema después de un pequeño retraso para permitir que la clase se aplique
+            setTimeout(() => {
+                if (document.body.getAttribute('data-theme') === 'dark') {
+                    document.body.removeAttribute('data-theme');
+                    this.innerHTML = '<i class="fas fa-moon"></i> Modo Oscuro';
+                } else {
+                    document.body.setAttribute('data-theme', 'dark');
+                    this.innerHTML = '<i class="fas fa-sun"></i> Modo Claro';
+                }
+                
+                // Eliminar la clase de transición después de completar el cambio
+                setTimeout(() => {
+                    document.body.classList.remove('theme-transition');
+                }, 500);
+            }, 50);
+        });
+
+        // Smooth scrolling para enlaces internos
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Initial state for theme toggle
+        document.getElementById('toggleTheme').innerHTML = '<i class="fas fa-sun"></i> Modo Claro';
+
+        // Automatic play/pause of background video based on visibility
+        document.addEventListener("DOMContentLoaded", function() {
+            const video = document.querySelector('.video-background video');
+            
+            // Check if video is in viewport to play/pause
+            function handleVideoVisibility() {
+                const rect = video.getBoundingClientRect();
+                const isVisible = 
+                    rect.top >= -rect.height && 
+                    rect.bottom <= window.innerHeight + rect.height;
+                
+                if (isVisible) {
+                    if (video.paused) video.play();
+                } else {
+                    if (!video.paused) video.pause();
+                }
+            }
+            
+            // Since video is fixed, we don't need to toggle play/pause based on visibility
+            if (video.paused) video.play();
+            
+            // Fallback if video fails to load
+            video.addEventListener('error', function() {
+                document.querySelector('.video-background').style.backgroundColor = 'var(--primary-color)';
+                document.querySelector('.video-overlay').style.background = 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7) 100%)';
+            });
+            
+            // Additional fallback for mobile devices that may not autoplay video
+            setTimeout(function() {
+                if (video.paused) {
+                    document.querySelector('.video-background').style.backgroundColor = 'var(--primary-color)';
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
